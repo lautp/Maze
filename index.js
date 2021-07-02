@@ -1,5 +1,6 @@
-const {World, Render, Runner, Engine, Bodies, MouseConstraint, Mouse} = Matter;
-const width = 800;
+const {World, Render, Runner, Engine, Bodies} = Matter;
+const cells = 5;
+const width = 600;
 const height = 600;
 const engine = Engine.create();
 const {world} = engine;
@@ -16,9 +17,6 @@ const render = Render.create({
 Render.run(render);
 Runner.run(Runner.create(), engine);
 
-World.add(world, MouseConstraint.create(engine, {
-    mouse: Mouse.create(render.canvas)
-}));
 
 // Walls my version
 /* for (let i = 0; i < 4; i++) {
@@ -58,27 +56,40 @@ World.add(world, MouseConstraint.create(engine, {
 // Walls tutorial
 
 const walls = [
-    Bodies.rectangle(400, 0, 800, 40, { isStatic:true }),
-    Bodies.rectangle(400, 600, 800, 40, { isStatic:true }),
-    Bodies.rectangle(0, 300, 40, 600, { isStatic:true }),
-    Bodies.rectangle(800, 300, 40, 600, { isStatic:true })
+    Bodies.rectangle(width/2, 0, width, 40, { isStatic:true, render: { fillStyle: 'purple'} }),
+    Bodies.rectangle(width/2, height, width, 40, { isStatic:true, render: { fillStyle: 'purple'} }),
+    Bodies.rectangle(0, height/2, 40, height, { isStatic:true, render: { fillStyle: 'purple'} }),
+    Bodies.rectangle(width, height/2, 40, height, { isStatic:true, render: { fillStyle: 'purple'} })
 ];
 
 World.add(world, walls);
 
-for (let i = 0; i < 40; i++) {
-    
-    if (Math.random()<0.5) {
-        World.add(world, Bodies.rectangle(Math.random()*width,Math.random()*height,50,50, {
-            isStatic:false,
-            render: {
-                fillStyle: 'indigo'}
-        }))
-    }else{
-        World.add(world, Bodies.circle(Math.random()*width,Math.random()*height, 35, {
-            isStatic:false,
-        }))
+/* const shuffle = function {
+
+} */
+
+const grid = Array(cells).fill(null).map(()=> Array(cells).fill(false));
+
+const verticals = Array(cells).fill(null).map(()=> Array(cells - 1).fill(false));
+
+const horizontals = Array(cells - 1).fill(null).map(()=> Array(cells).fill(false));
+
+const startRow = Math.floor(Math.random() * cells);
+
+const stepThroughCell = function (row, column) {
+
+    if (grid[row][column]) {
+        return;
     }
-    ;
-    
+
+    grid[row][column] = true;
+
+    const neighbours = [
+        [row - 1, column],
+        [row, column + 1],
+        [row - 1, column],
+        [row, column - 1]
+    ]
 }
+
+console.log(grid);
