@@ -1,10 +1,13 @@
-const {World, Render, Runner, Engine, Bodies} = Matter;
-const cells = 30;
+const {World, Render, Runner, Engine, Bodies, Body, Events} = Matter;
+const cells = 3;
 const width = 600;
 const height = 600;
 const unitLength = width/cells;
+
 const engine = Engine.create();
+
 const {world} = engine;
+engine.world.gravity.y = 0;
 const render = Render.create({
     element: document.body,
     engine: engine,
@@ -21,10 +24,10 @@ Runner.run(Runner.create(), engine);
 // Walls 
 
 const walls = [
-    Bodies.rectangle(width/2, 0, width, 40, { isStatic:true, render: { fillStyle: 'purple'} }),
-    Bodies.rectangle(width/2, height, width, 40, { isStatic:true, render: { fillStyle: 'purple'} }),
-    Bodies.rectangle(0, height/2, 40, height, { isStatic:true, render: { fillStyle: 'purple'} }),
-    Bodies.rectangle(width, height/2, 40, height, { isStatic:true, render: { fillStyle: 'purple'} })
+    Bodies.rectangle(width/2, 0, width, 2, { isStatic:true, render: { fillStyle: 'purple'} }),
+    Bodies.rectangle(width/2, height, width, 2, { isStatic:true, render: { fillStyle: 'purple'} }),
+    Bodies.rectangle(0, height/2, 2, height, { isStatic:true, render: { fillStyle: 'purple'} }),
+    Bodies.rectangle(width, height/2, 2, height, { isStatic:true, render: { fillStyle: 'purple'} })
 ];
 
 World.add(world, walls);
@@ -149,4 +152,68 @@ verticals.forEach( (row, rowIndex) => {
 
     });
 
+});
+
+//Goal
+
+const goal = Bodies.rectangle(
+    width-unitLength/2,
+    height-unitLength/2,
+    unitLength * 0.7,
+    unitLength * 0.7,
+    {
+        label: 'goal',
+        isStatic: true,
+        render: {
+            fillStyle: "red"
+        }
+    }
+)
+
+World.add(world, goal);
+
+//Ball
+
+const ball = Bodies.circle(
+    unitLength/2,
+    unitLength/2,
+    unitLength/4,
+    {
+        label: 'ball',
+        isStatic:false,
+        render: {
+            fillStyle:"green"
+        }
+    }
+);
+
+World.add(world, ball);
+
+document.addEventListener('keydown', (event) =>{
+    const {x,y} = ball.velocity;
+
+    if (event.keyCode === 87 || event.keyCode === 38) {
+        Body.setVelocity(ball, {x, y: y - 2})
+    }
+    if (event.keyCode === 68 || event.keyCode === 39) {
+        Body.setVelocity(ball, {x: x + 2, y})
+    }
+    if (event.keyCode === 83 || event.keyCode === 40) {
+        Body.setVelocity(ball, {x, y: y + 2})
+    }
+    if (event.keyCode === 65 || event.keyCode === 37) {
+        Body.setVelocity(ball, {x: x - 2, y})
+    }
+});
+
+//Win con
+
+Events.on(engine, 'collisionStart', event => {
+event.pairs.forEach( collision => {
+    const labels = ['ball', 'goal']
+
+    if (labels.includes(collision.bodyA.label) && labels.includes(collision.bodyB.label)) {
+        console.log('You won!');
+    }
+});
 });
